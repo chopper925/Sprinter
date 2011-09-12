@@ -805,17 +805,17 @@ inline void process_commands()
       #if FAN_PIN > -1
       case 106: //M106 Fan On
         if (code_seen('S')){
-            WRITE(FAN_PIN, HIGH);
-            analogWrite(FAN_PIN, constrain(code_value(),0,255) );
+            WRITE(FAN_PIN, LOW);
+            analogWrite(FAN_PIN, -constrain(code_value(),0,255) );
         }
         else {
-            WRITE(FAN_PIN, HIGH);
-            analogWrite(FAN_PIN, 255 );
+            WRITE(FAN_PIN, LOW);
+            analogWrite(FAN_PIN, 0 );
         }
         break;
       case 107: //M107 Fan Off
-          analogWrite(FAN_PIN, 0);
-          WRITE(FAN_PIN, LOW);
+          analogWrite(FAN_PIN, 255);
+          WRITE(FAN_PIN, HIGH);
         break;
       #endif
       #if (PS_ON_PIN > -1)
@@ -1405,9 +1405,9 @@ void manage_heater()
     if(watchmillis && millis() - watchmillis > WATCHPERIOD){
         if(watch_raw + 1 >= current_raw){
             target_raw = 0;
-            WRITE(HEATER_0_PIN,LOW);
+            WRITE(HEATER_0_PIN,HIGH);
             #if LED_PIN>-1
-                WRITE(LED_PIN,LOW);
+                WRITE(LED_PIN,HIGH);
             #endif
         }else{
             watchmillis = 0;
@@ -1432,20 +1432,20 @@ void manage_heater()
       iTerm = (PID_IGAIN * temp_iState) / 100;
       dTerm = (PID_DGAIN * (current_raw - temp_dState)) / 100;
       temp_dState = current_raw;
-      analogWrite(HEATER_0_PIN, constrain(pTerm + iTerm - dTerm, 0, PID_MAX));
+      analogWrite(HEATER_0_PIN, constrain(pTerm + iTerm - dTerm, 255, PID_MAX));
     #else
       if(current_raw >= target_raw)
       {
-        WRITE(HEATER_0_PIN,LOW);
+        WRITE(HEATER_0_PIN,HIGH);
         #if LED_PIN>-1
-            WRITE(LED_PIN,LOW);
+            WRITE(LED_PIN,HIGH);
         #endif
       }
       else 
       {
-        WRITE(HEATER_0_PIN,HIGH);
+        WRITE(HEATER_0_PIN,LOW);
         #if LED_PIN > -1
-            WRITE(LED_PIN,HIGH);
+            WRITE(LED_PIN,LOW);
         #endif
       }
     #endif
@@ -1480,11 +1480,11 @@ void manage_heater()
   
     if(current_bed_raw >= target_bed_raw)
     {
-      WRITE(HEATER_1_PIN,LOW);
+      WRITE(HEATER_1_PIN,HIGH);
     }
     else 
     {
-      WRITE(HEATER_1_PIN,HIGH);
+      WRITE(HEATER_1_PIN,LOW);
     }
     #endif
 }
@@ -1565,11 +1565,11 @@ inline void kill()
 {
   #if TEMP_0_PIN > -1
   target_raw=0;
-  WRITE(HEATER_0_PIN,LOW);
+  WRITE(HEATER_0_PIN,HIGH);
   #endif
   #if TEMP_1_PIN > -1
   target_bed_raw=0;
-  if(HEATER_1_PIN > -1) WRITE(HEATER_1_PIN,LOW);
+  if(HEATER_1_PIN > -1) WRITE(HEATER_1_PIN,HIGH);
   #endif
   disable_x();
   disable_y();
