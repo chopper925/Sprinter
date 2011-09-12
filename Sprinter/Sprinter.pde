@@ -806,7 +806,7 @@ inline void process_commands()
       case 106: //M106 Fan On
         if (code_seen('S')){
             WRITE(FAN_PIN, LOW);
-            analogWrite(FAN_PIN, -constrain(code_value(),0,255) );
+            analogWrite(FAN_PIN, constrain(255-code_value(),0,255) );
         }
         else {
             WRITE(FAN_PIN, LOW);
@@ -1407,7 +1407,7 @@ void manage_heater()
             target_raw = 0;
             WRITE(HEATER_0_PIN,HIGH);
             #if LED_PIN>-1
-                WRITE(LED_PIN,HIGH);
+                WRITE(LED_PIN,LOW);
             #endif
         }else{
             watchmillis = 0;
@@ -1432,20 +1432,20 @@ void manage_heater()
       iTerm = (PID_IGAIN * temp_iState) / 100;
       dTerm = (PID_DGAIN * (current_raw - temp_dState)) / 100;
       temp_dState = current_raw;
-      analogWrite(HEATER_0_PIN, constrain(pTerm + iTerm - dTerm, 255, PID_MAX));
+      analogWrite(HEATER_0_PIN, constrain(255-pTerm + iTerm - dTerm, 0, PID_MAX));
     #else
       if(current_raw >= target_raw)
       {
         WRITE(HEATER_0_PIN,HIGH);
         #if LED_PIN>-1
-            WRITE(LED_PIN,HIGH);
+            WRITE(LED_PIN,LOW);
         #endif
       }
       else 
       {
         WRITE(HEATER_0_PIN,LOW);
         #if LED_PIN > -1
-            WRITE(LED_PIN,LOW);
+            WRITE(LED_PIN,HIGH);
         #endif
       }
     #endif
